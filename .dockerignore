@@ -2,4 +2,5 @@ tmp
 .air.toml
 note.txt
 .env
-*.test.go
+*test.go
+*.txt

@@ -3,6 +3,9 @@ package controllers
 import (
 	//"encoding/json"
 
+	"database/sql"
+	"net/http"
+
 	"github.com/ayo-ajayi/rest_api_template/model"
 	"github.com/gin-gonic/gin"
 )
@@ -11,9 +14,10 @@ type DBInterface interface {
 	GetChoice() ([]model.Choice, error)
 	CheckID(id string) (*model.Choice, error)
 	DeleteChoice(id string) error
-	PostChoice(newChoice model.Choice) error
+	PostChoice(newChoice *model.Choice) error
 	UpdateChoice(updateChoice model.Choice) error
 }
+
 type Controller struct {
 	DB DBInterface
 }
@@ -34,8 +38,12 @@ func (ctr *Controller) GetChoiceCtr(c *gin.Context) {
 func (ctr *Controller) CheckID(c *gin.Context) {
 	id := c.Param("id")
 	a, err := ctr.DB.CheckID(id)
-	if err != nil {
-		c.JSON(400, err.Error())
+	switch {
+	case err == sql.ErrNoRows:
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	case err != nil:
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.Set("values", *a)
@@ -58,8 +66,7 @@ func (ctr *Controller) DeleteChoiceCtr(c *gin.Context) {
 	c.Writer.Header().Set("Content-Type", "application/json")
 	c.JSON(200, gin.H{
 		"message": "deleted successfully",
-		// "deleted": b,
-
+		"id":      res.ID,
 	})
 }
 
@@ -69,8 +76,8 @@ func (ctr *Controller) PostChoiceCtr(c *gin.Context) {
 		c.JSON(404, gin.H{"error": err.Error()})
 		return
 	}
-	if err := ctr.DB.PostChoice(newChoice); err != nil {
-		c.JSON(400, err)
+	if err := ctr.DB.PostChoice(&newChoice); err != nil {
+		c.JSON(404, err)
 		return
 	}
 
@@ -95,7 +102,7 @@ func (ctr *Controller) UpdateChoiceCtr(c *gin.Context) {
 	}
 
 	c.Writer.Header().Set("Content-Type", "application/json")
-	c.JSON(200, gin.H{"message": "sucess",
+	c.JSON(200, gin.H{"message": "success",
 		"record": updateChoice})
 
 }
