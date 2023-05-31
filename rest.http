@@ -1,38 +1,33 @@
+###
 GET http://localhost:8000/ HTTP/1.1
 
+
 ###
-
-POST http://localhost:8000/
+POST http://localhost:8000/ HTTP/1.1
 Content-Type: application/json
-
 {
     "gone": false,
     "come": true
 }
 
-###
-
-DELETE http://localhost:8000/5495816f-1f3a-4fdd-9d08-1168b0cd6ef5/
 
 ###
+GET http://localhost:8000/aec4d56e-c606-4c1a-9c30-84d431a19bfb/ HTTP/1.1
 
-PUT http://localhost:8000/187f454c-0a50-4621-bcc8-4929495b8443/
+
+###
+PUT http://localhost:8000/187f454c-0a50-4621-bcc8-4929495b8443/ HTTP/1.1
 Content-Type: application/json
-
 {
     "gone": true,
     "come": true
 }
 
-###
 
-GET http://localhost:8000/aec4d56e-c606-4c1a-9c30-84d431a19bfb/ HTTP/1.1
+###
+DELETE http://localhost:8000/5495816f-1f3a-4fdd-9d08-1168b0cd6ef5/ HTTP/1.1
+
 
 ###
 #304 means - not modified. i.e the web page requested hasn't changed since the last time it was accessed.
 #After that the browser will retrieve the cached version of the web page in the local storage
-
-
-
-###
-DELETE http://localhost:8000/
