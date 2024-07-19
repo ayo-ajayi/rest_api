@@ -6,7 +6,6 @@ type Choice struct {
 	Come bool   `json:"come"`
 }
 
-
 //define a Choice CRUD struct(that cannot be exportd) that can access the Choice members and define sql queries for CRUD operations within it as its own members
 //it will use the members of the Choice Struct to as arguments of the SQL code
 /*

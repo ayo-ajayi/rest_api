@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
 	"github.com/ayo-ajayi/rest_api_template/app"
 	_ "github.com/lib/pq"
+	"log"
 )
 
 func main() {

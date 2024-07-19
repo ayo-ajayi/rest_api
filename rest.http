@@ -27,7 +27,3 @@ Content-Type: application/json
 ###
 DELETE http://localhost:8000/5495816f-1f3a-4fdd-9d08-1168b0cd6ef5/ HTTP/1.1
 
-
-###
-#304 means - not modified. i.e the web page requested hasn't changed since the last time it was accessed.
-#After that the browser will retrieve the cached version of the web page in the local storage

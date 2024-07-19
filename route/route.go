@@ -8,24 +8,24 @@ import (
 	cors "github.com/rs/cors/wrapper/gin"
 )
 
-
-
-
 func SetupRouter(ctrl *ctr.Controller) (*gin.Engine, error) {
 	router := gin.Default()
+	router.Use(func(c *gin.Context) {
+		c.Header("Content-Type", "application/json")
+		c.Next()
+	},
+	)
 	router.GET("/favicon.ico", func(ctx *gin.Context) {
 		ctx.File("./favicon.png")
 	})
 	CORSMiddleware := cors.Default()
-
 	router.Use(CORSMiddleware)
 
-	choiceByID := router.Group("/:id")
+	choiceByID := router.Group("/:id", ctrl.CheckID)
 	{
-		choiceByID.Use(ctrl.CheckID)
-		choiceByID.GET("/", ctrl.GetChoiceByIDCtr)
-		choiceByID.PUT("/", ctrl.UpdateChoiceCtr)
-		choiceByID.DELETE("/", ctrl.DeleteChoiceCtr)
+		choiceByID.GET("", ctrl.GetChoiceByIDCtr)
+		choiceByID.PUT("", ctrl.UpdateChoiceCtr)
+		choiceByID.DELETE("", ctrl.DeleteChoiceCtr)
 	}
 	choiceAll := router.Group("/")
 	{
@@ -34,7 +34,7 @@ func SetupRouter(ctrl *ctr.Controller) (*gin.Engine, error) {
 	}
 
 	router.NoRoute(func(ctx *gin.Context) {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "NOT FOUND"})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "endpoint not found"})
 	})
 	return router, nil
 }

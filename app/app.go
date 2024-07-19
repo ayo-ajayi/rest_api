@@ -17,13 +17,15 @@ import (
 
 type App struct {
 	server   *http.Server
-	database *db.DBStruct
+	database *db.DBClient
 }
 
 func NewApp() (*App, error) {
-	database, err := db.DBinit()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	database, err := db.DBinit(ctx)
 	if err != nil {
-		log.Fatalf("Error initializing databse: %v", err)
+		log.Fatalf("Error initializing database: %v", err)
 	}
 
 	ctrl := controllers.NewController(database)
@@ -35,7 +37,7 @@ func NewApp() (*App, error) {
 		server: &http.Server{
 			Addr:    ":8000",
 			Handler: router,
-		}, database: &database}, nil
+		}, database: database}, nil
 }
 
 func (a *App) Start() {
@@ -45,7 +47,7 @@ func (a *App) Start() {
 		if err := a.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("server failed to start: %v", err)
 		}
-	}()//server MUST be served in this goroutine
+	}()
 	log.Println("Server is running🎉🎉. Press Ctrl+C to stop")
 
 	<-stop
