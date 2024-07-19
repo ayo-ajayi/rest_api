@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/ayo-ajayi/rest_api_template/model"
@@ -55,9 +54,9 @@ var DBinit = func(ctx context.Context) (*DBClient, error) {
 			}
 			if _, err = db.Exec(
 				`CREATE TABLE IF NOT EXISTS choice(
-						id VARCHAR(36),
-						go BOOL,
-						come BOOL
+						id VARCHAR(36) PRIMARY KEY,
+						go VARCHAR(5),
+						come VARCHAR(5)
 					)`); err != nil {
 				errCh <- fmt.Errorf("could not create table: %s", err.Error())
 				return
@@ -86,7 +85,6 @@ func (db DBClient) CheckID(ctx context.Context, id string) (*model.Choice, error
 func (db DBClient) GetChoice(ctx context.Context) ([]model.Choice, error) {
 	rows, err := db.Session.QueryContext(ctx, `SELECT id, go, come FROM choice LIMIT 20`)
 	if err != nil {
-		log.Println("error immediately after running query:", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -95,9 +93,7 @@ func (db DBClient) GetChoice(ctx context.Context) ([]model.Choice, error) {
 	for rows.Next() {
 		var c model.Choice
 		err := rows.Scan(&c.ID, &c.Gone, &c.Come)
-
 		if err != nil {
-			log.Println("error after rows.scan:", err)
 			return nil, err
 		}
 		choice = append(choice, c)
@@ -105,7 +101,6 @@ func (db DBClient) GetChoice(ctx context.Context) ([]model.Choice, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Println("error from rows.Err():", err)
 		return nil, err
 	}
 	return choice, nil

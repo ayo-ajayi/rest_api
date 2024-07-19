@@ -76,10 +76,18 @@ func (ctr *Controller) DeleteChoiceCtr(c *gin.Context) {
 }
 
 func (ctr *Controller) PostChoiceCtr(c *gin.Context) {
-	newChoice := model.Choice{}
-	if err := c.ShouldBindJSON(&newChoice); err != nil {
+	req := struct {
+		Gone string `json:"gone" binding:"required"`
+		Come string `json:"come" binding:"required"`
+	}{}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(404, gin.H{"error": err.Error()})
 		return
+	}
+	newChoice := model.Choice{
+		Gone: req.Gone,
+		Come: req.Come,
 	}
 	if err := ctr.DB.PostChoice(c, &newChoice); err != nil {
 		c.JSON(404, gin.H{"error": err.Error()})
@@ -98,13 +106,19 @@ func (ctr *Controller) UpdateChoiceCtr(c *gin.Context) {
 		return
 	}
 	id := res.(model.Choice).ID
-	updateChoice := model.Choice{}
-	if err := c.ShouldBindJSON(&updateChoice); err != nil {
+	req := struct {
+		Gone string `json:"gone" binding:"required"`
+		Come string `json:"come" binding:"required"`
+	}{}
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(404, gin.H{"error": err.Error()})
 		return
 	}
-	updateChoice.ID = id
-
+	updateChoice := model.Choice{
+		ID:   id,
+		Gone: req.Gone,
+		Come: req.Come,
+	}
 	if err := ctr.DB.UpdateChoice(c, updateChoice); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
